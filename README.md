@@ -4,8 +4,8 @@ Interact with it by messaging it directly. For example:
 
     gamemaster: Greetings!
 
-There are also some basic configuration variables at the top of the script to edit to set some IRC connection settings.
+Please start by renaming config.pl.sample to config.pl. There are basic configuration variables in config.pl to edit to set IRC connection settings.
 
 REQUIRES: 
- * Bot::BasicBot;
- * DBI;
+ * Bot::BasicBot
+ * DBI
