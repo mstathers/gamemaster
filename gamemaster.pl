@@ -118,7 +118,7 @@ sub Bot::BasicBot::said {
 
 # Just to change what happens when somebody sends the bot "help"
 sub Bot::BasicBot::help {
-    return "I am the Game Master!";
+    return "I am the Game Master! See more about me here: https://github.com/mstathers/gamemaster";
 }
 
 # $bot object constructor.
