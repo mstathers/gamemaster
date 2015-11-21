@@ -42,9 +42,9 @@ sub game() {
     my $select = $dbh->prepare(
         "SELECT strength, level, exp, fighting FROM
         characters where
-        nick = '$nick'"
+        nick = ?"
     );
-    $select->execute();
+    $select->execute($nick);
     my ($char_str, $char_lvl, $char_exp, $monster_id) = $select->fetchrow_array();
 
     # If there is a monster, we can fight it!
@@ -53,9 +53,9 @@ sub game() {
         my $select = $dbh->prepare(
             "SELECT name,strength,level FROM
             monsters where
-            id = '$monster_id'"
+            id = ?"
         );
-        $select->execute();
+        $select->execute($monster_id);
         my ($mon_name, $mon_str, $mon_lvl) = $select->fetchrow_array();
 
         # If they wanted to fight, let them!
@@ -99,9 +99,9 @@ sub check_character() {
     my $select = $dbh->prepare(
         "SELECT * FROM
         characters where
-        nick = '$nick'"
+        nick = ?"
     );
-    $select->execute();
+    $select->execute($nick);
     my $select_result = $select->fetch();
 
     # Normally, yes.
@@ -115,13 +115,13 @@ sub check_character() {
         "INSERT INTO characters
         (nick, strength, level, exp, fighting)
         values (
-        '$nick',
+        ?,
         10,
         1,
         0,
         1);"
     );
-    $insert->execute();
+    $insert->execute($nick);
     # We will send them a welcome message.
     return $story->welcome($nick);
 }
@@ -159,9 +159,9 @@ sub reset_monster() {
     my $update = $dbh->prepare(
         "UPDATE characters
         SET fighting = null
-        where nick = '$nick'"
+        where nick = ?"
     );
-    $update->execute();
+    $update->execute($nick);
     return undef;
 }
 
@@ -198,19 +198,19 @@ sub calc_exp() {
     # We need to update the character's EXP in the DB.
     my $update = $dbh->prepare(
         "UPDATE characters
-        SET exp = exp + $exp_gain
-        where nick = '$nick'"
+        SET exp = exp + ?
+        where nick = ?"
     );
-    $update->execute();
+    $update->execute($exp_gain, $nick);
 
 
     # We also need to see if they leveled up!
     my $select = $dbh->prepare(
         "SELECT exp FROM
         characters where
-        nick = '$nick'"
+        nick = ?"
     );
-    $select->execute();
+    $select->execute($nick);
     my ($char_exp) = $select->fetchrow_array();
 
     # Calculate what the character's level should be.
@@ -220,10 +220,10 @@ sub calc_exp() {
     if ($new_level > $char_lvl) {
         my $update = $dbh->prepare(
             "UPDATE characters
-            SET level = $new_level
-            where nick = '$nick'"
+            SET level = ?
+            where nick = ?"
         );
-        $update->execute();
+        $update->execute($new_level, $nick);
 
         # We need to pass back if we level up.
         return "$new_level";
@@ -253,19 +253,19 @@ sub new_quest() {
     # character.
     my $update = $dbh->prepare(
         "UPDATE characters
-        SET fighting = $random_monster
-        where nick = '$nick'"
+        SET fighting = ?
+        where nick = ?"
     );
-    $update->execute();
+    $update->execute($random_monster, $nick);
 
 
     # Let's get some info about the monster
     $select = $dbh->prepare(
         "SELECT name FROM
         monsters where
-        id = '$random_monster'"
+        id = ?"
     );
-    $select->execute();
+    $select->execute($random_monster);
     my ($mon_name) = $select->fetchrow_array();
 
     return $story->new_quest($nick,$mon_name);
