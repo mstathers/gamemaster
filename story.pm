@@ -88,17 +88,22 @@ sub waiting() {
 
     my $text = qq/The brave knight $nick waits, weapon drawn, for the
     opportune moment to strike the $monster. $nick knows that timing is key
-    to this victory!/;
+    to this battle! $nick is getting ready to either "fight" or "flee" the
+    $monster./;
 
     return &stripper($text);
 }
 
+sub new_quest() {
+    my ($self, $nick, $monster) = @_;
 
+    #TODO Perhaps we should store these in DB so that they can be different
+    #     for each monster?
+    my $text = qq/A frightening $monster jumps out at $nick. $nick must
+    choose to either "fight" it or "flee" from it.
+    /;
 
-
-sub quest() {
-    my ($self, $nick) = @_;
-
+    return &stripper($text);
 }
 
 return 1;

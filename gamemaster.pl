@@ -63,7 +63,7 @@ sub game() {
             my $combat_result = &fight($char_str, $char_lvl, $mon_str, $mon_lvl);
             
             # This enemy is finished, win or lose.
-            #&reset_monster($nick);
+            &reset_monster($nick);
 
             # How did they do?
             if ($combat_result =~ /victory/) {
@@ -85,8 +85,7 @@ sub game() {
         return $story->waiting($nick,$mon_name);
     }
 
-#    return $story->quest($message->{who});
-    return "I guess you weren't fighting a monster";
+    return &new_quest($nick);
 }
 
 # Routine to see if we know a character, or option make a new one.
@@ -137,7 +136,7 @@ sub fight() {
     my $char_str_mod = (($char_str - ($char_str % 2)) - 10) / 2;
     my $mon_str_mod = (($mon_str - ($mon_str % 2)) - 10) / 2;
 
-    # We roll a d20 and add the modifier and the lvl.
+    # We roll a d20 and add the modifier the lvl..
     my $char_roll = int(rand(20) + $char_str_mod + $char_lvl);
     my $mon_roll = int(rand(20) + $mon_str_mod + $mon_lvl);
 
@@ -162,6 +161,7 @@ sub reset_monster() {
     $update->execute();
     return undef;
 }
+
 
 # Used to calculate EXP. We we use the difference in levels to do this:
 #
@@ -229,6 +229,46 @@ sub calc_exp() {
     # We can be quiet.
     return undef;
 }
+
+
+sub new_quest() {
+    my ($nick) = @_;
+
+    # How many monsters do we have?
+    my $select = $dbh->prepare(
+        "SELECT id FROM
+        monsters WHERE
+        id = (SELECT MAX(id) FROM
+        monsters)"
+    );
+    $select->execute();
+    my ($monster_max_id) = $select->fetchrow_array();
+    # Random monster id. This is +1 because we odn't want zero.
+    my $random_monster = int(rand($monster_max_id) + 1);
+
+    # we need to save to the db that this monster is fighting the
+    # character.
+    my $update = $dbh->prepare(
+        "UPDATE characters
+        SET fighting = $random_monster
+        where nick = '$nick'"
+    );
+    $update->execute();
+
+
+    # Let's get some info about the monster
+    $select = $dbh->prepare(
+        "SELECT name FROM
+        monsters where
+        id = '$random_monster'"
+    );
+    $select->execute();
+    my ($mon_name) = $select->fetchrow_array();
+
+    return $story->new_quest($nick,$mon_name);
+}
+
+
 
 ##################################
 #                                #
