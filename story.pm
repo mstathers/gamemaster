@@ -88,8 +88,8 @@ sub waiting() {
 
     my $text = qq/The brave knight $nick waits, weapon drawn, for the
     opportune moment to strike the $monster. $nick knows that timing is key
-    to this battle! $nick is getting ready to either "fight" or "flee" the
-    $monster./;
+    to this battle! $nick is getting ready to either "fight" or "flee" from
+    the $monster./;
 
     return &stripper($text);
 }

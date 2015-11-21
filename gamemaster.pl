@@ -77,6 +77,9 @@ sub game() {
 
         # If the character decides to flee the battle!
         if ($message->{body} =~ /flee/i) {
+            # You ran away, you are no longer fighting the monster.
+            &reset_monster($nick);
+
             return $story->flee($nick,$mon_name);
         }
 
