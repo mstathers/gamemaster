@@ -70,15 +70,19 @@ sub game() {
                 my $new_level = &calc_exp($nick, $char_lvl, $mon_lvl);
                 return $story->victory($nick,$mon_name,$new_level);
             }
-            if ($combat_result =~ /failure/) {
-                return "you lose";
+            if ($combat_result =~ /defeat/) {
+                return $story->defeat($nick,$mon_name);
             }
         }
 
-        # Did they not try to fight their assailant?
-        else {
-            return $story->afraid($nick,$mon_name);
+        # If the character decides to flee the battle!
+        if ($message->{body} =~ /flee/i) {
+            return $story->flee($nick,$mon_name);
         }
+
+        # did they just do something besides attack or flee from their
+        # monster?
+        return $story->waiting($nick,$mon_name);
     }
 
 #    return $story->quest($message->{who});
@@ -142,7 +146,7 @@ sub fight() {
         return "victory";
     }
     else {
-        return "failure";
+        return "defeat";
     }
 }
 

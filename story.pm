@@ -30,32 +30,23 @@ sub welcome() {
     my $greeting = qq/The valiant knight $nick approaches! $nick is ready to
     head out to face the evil of the world and rise triumphant over all
     foes!/;
-    my $first_combat = qq/As you are traveling up the road, you hear a
-    rustling of bushes beside you. With a shriek a goblin jumps out onto the
-    road and assaults you with his crude dagger! You must "fight" it!/;
+    my $first_combat = qq/As $nick travels up the road, the knight hears a
+    rustling of bushes nearby. With a loud shriek a goblin jumps out onto
+    the road and assaults knight $nick with a crude dagger! $nick can either
+    "fight" or "flee" from it./;
 
     my $text = &stripper($greeting) . "\n" . &stripper($first_combat);
     return $text;
 }
 
-# If a character is supposed to be fighting something but they aren't 
-# actually fighting for some reason.
-sub afraid() {
-    my ($self, $nick, $monster) = @_;
-
-    my $text = qq/The brave knight $nick waits, weapon drawn, for the
-    opportune moment to strike the $monster. $nick knows that timing is key
-    to this victory!/;
-
-    return &stripper($text);
-}
-
 # If the character is victorious!
 sub victory() {
-    my ($self, $nick, $mon_name, $new_level) = @_;
+    my ($self, $nick, $monster, $new_level) = @_;
 
-    my $victory = qq/With an arcing swing of $nick\'s blade, the
-    great warrior puts the $mon_name out of its misery for good!/;
+    my $victory = qq/With an arcing swing of $nick\'s shining blade, the
+    heroic knight puts the $monster out of its misery for good! $nick is
+    rewarded only in knowing that the $monster will not be able to continue
+    terrorizing the local people any longer./;
 
     # Specially message if we leveled up.
     if (defined($new_level)) {
@@ -67,6 +58,40 @@ sub victory() {
     return &stripper($victory);
 }
 
+# defeat
+sub defeat() {
+    my ($self, $nick, $monster) = @_;
+
+    my $text = qq/Suffering from a unfortunate defeat against the mighty
+    $monster, $nick picks himself up and limps back up the road. The valiant
+    knight vows to return in order to destroy the evil $monster, once and
+    for all!/;
+
+    return &stripper($text);
+}
+
+# Flee for your live!
+sub flee() {
+    my ($self, $nick, $monster) = @_;
+
+    my $text = qq/Uncharacteristically, the brave knight $nick makes an
+    expeditious retreat from the $monster at the first opportunity, leaving
+    only pride behind!/;
+
+    return &stripper($text);
+}
+
+# If a character is supposed to be fighting something but they aren't 
+# actually fighting for some reason.
+sub waiting() {
+    my ($self, $nick, $monster) = @_;
+
+    my $text = qq/The brave knight $nick waits, weapon drawn, for the
+    opportune moment to strike the $monster. $nick knows that timing is key
+    to this victory!/;
+
+    return &stripper($text);
+}
 
 
 

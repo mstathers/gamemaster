@@ -34,12 +34,12 @@ level INT);
 -- INSERTING MONSTERS (goblin) --
 INSERT INTO "monsters"
 (name,strength,level) VALUES
-('goblin',6,1);
+('goblin',1,1);
 
 -- INSERTING MONSTERS, MASS --
 INSERT INTO "monsters" 
 (name,strength,level)
-select 'hobgoblin' as name,10 as strength,2 as level
-union select 'dog',3,1
-union select 'thug',11,1
-union select 'bandit',9,1;
+select 'hobgoblin' as name,6 as strength,2 as level
+union select 'dog',2,1
+union select 'thug',7,1
+union select 'bandit',5,1;
