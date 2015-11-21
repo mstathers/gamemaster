@@ -36,21 +36,26 @@ sub check_db() {
 
     # Normally, yes.
     if ( defined($select_result) ) {
-        print "DB table exists.\n";
+        print "DB exists.\n";
         return 1;
     }
 
     # If not, we will create the schema.
-    print "DB table does not exist yet. Creating...\n";
-    my $create_table = $dbh->prepare(
-        "CREATE TABLE characters(
-        id INTEGER PRIMARY KEY ASC,
-        nick TEXT,
-        strength INT,
-        level INT)"
-    );
-    $create_table->execute();
-    return 1;
+    print "DB does not exist yet or is broken. Creating...\n";
+    if (! -f "gm_schema") {
+        die "file gm_schema doesn't exist, cannot create DB\n";
+    }
+
+    # This allows us to preload some monsters and more easily
+    # manage db schema.
+    #
+    # TODO Currently very "hacky".
+    my $sqlite_cmd_output = `sqlite3 $sqlite_db < gm_schema`;
+    if ($sqlite_cmd_output =~ /Error/){
+        print "$sqlite_cmd_output\n";
+        `rm $sqlite_db`;
+        exit 
+    }
 }
 
 
@@ -59,10 +64,13 @@ sub game() {
     my $message = $_[0];
 
     # Log  message
-    print "$message->{who}: $message->{address}\n";
+    print "log: $message->{who}: $message->{body}\n";
 
     # Do we recognize this character?
     &check_character($message->{who});
+
+    # Offer up a quest!
+    #return $story->quest($nick);
 }
 
 # Routine to see if we know a character, or option make a new one.
@@ -87,10 +95,12 @@ sub check_character() {
     print "Nick $nick doesn't exist yet. Meet and greet...\n";
     my $insert = $dbh->prepare(
         "INSERT INTO characters
-        (nick, strength, level)
+        (nick, strength, level, exp, fighting)
         values (
         '$nick',
         10,
+        1,
+        0,
         1);"
     );
     $insert->execute();
@@ -118,7 +128,10 @@ sub Bot::BasicBot::said {
 
 # Just to change what happens when somebody sends the bot "help"
 sub Bot::BasicBot::help {
-    return "I am the Game Master! See more about me here: https://github.com/mstathers/gamemaster";
+    my $message = "I am the Game Master! " .
+    "Feel free to message me and you can get started on your mighty quest! " .
+    "See more about me here: https://github.com/mstathers/gamemaster";
+    return $message;
 }
 
 # $bot object constructor.

@@ -1,0 +1,45 @@
+-- Table: characters
+-- 
+-- Columns:
+--  id = Unique key.
+--  nick = Character name, also irc nick.
+--  stregth = Character strength attribute.
+--  level = Character level.
+--  exp = Character exp.
+--  fighting = Id of monster they are fighting; null if not fighting.
+--
+CREATE TABLE characters(
+id INTEGER PRIMARY KEY ASC,
+nick TEXT,
+strength INT,
+level INT,
+exp INT,
+fighting INT);
+
+
+-- Table: monsters
+--
+-- Columns:
+--  id = Unique key.
+--  name = Monster name.
+--  strength = Monster strength attribute.
+--  level = Monster level.
+--
+CREATE TABLE monsters(
+id INTEGER PRIMARY KEY ASC,
+name TEXT,
+strength INT,
+level INT);
+
+-- INSERTING MONSTERS (goblin) --
+INSERT INTO "monsters"
+(name,strength,level) VALUES
+('goblin',6,1);
+
+-- INSERTING MONSTERS, MASS --
+INSERT INTO "monsters" 
+(name,strength,level)
+select 'hobgoblin' as name,10 as strength,2 as level
+union select 'dog',3,1
+union select 'thug',11,1
+union select 'bandit',9,1;
