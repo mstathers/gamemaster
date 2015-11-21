@@ -58,11 +58,12 @@ sub game() {
         $select->execute();
         my ($mon_name, $mon_str, $mon_lvl) = $select->fetchrow_array();
 
-
         # If they wanted to fight, let them!
         if ($message->{body} =~ /fight/i) {
-            return "Monster: $mon_name MonsterStr: $mon_str MonsterLvl: $mon_lvl";
+            my $combat_result = &fight($char_str, $char_lvl, $mon_str, $mon_lvl);
+            return $combat_result;
         }
+
         # Did they not try to fight their assailant?
         else {
             return $story->afraid($nick,$mon_name);
@@ -107,6 +108,32 @@ sub check_character() {
     # We will send them a welcome message.
     return $story->welcome($nick);
 }
+
+sub fight() {
+    my ($char_str, $char_lvl, $mon_str, $mon_lvl) = @_;
+
+    # We calculate modifiers - I am using the pfsrd ability score modifierds
+    # for inspiration under the OGL.
+    #
+    # http://www.d20pfsrd.com/basics-ability-scores/ability-scores
+    # http://www.d20pfsrd.com/extras/community-use
+    # https://en.wikipedia.org/wiki/Open_Game_License
+    my $char_str_mod = (($char_str - ($char_str % 2)) - 10) / 2;
+    my $mon_str_mod = (($mon_str - ($mon_str % 2)) - 10) / 2;
+
+    # We roll a d20 and add the modifier and the lvl.
+    my $char_roll = int(rand(20) + $char_str_mod + $char_lvl);
+    my $mon_roll = int(rand(20) + $mon_str_mod + $mon_lvl);
+
+    # Who wins? Tie goes to the character.
+    if ($char_roll >= $mon_roll) {
+        return "victory";
+    }
+    else {
+        return "failure";
+    }
+}
+
 
 
 ##################################
