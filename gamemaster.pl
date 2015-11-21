@@ -23,42 +23,6 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite_db","","");
 my $story = story->new();
 
 
-# Some pre-flight checks - this will create the schema.
-sub check_db() {
-    # Does the table exist in the DB?
-    my $select = $dbh->prepare(
-        "SELECT * FROM
-        sqlite_master where
-        name = 'characters'"
-    );
-    $select->execute();
-    my $select_result = $select->fetch();
-
-    # Normally, yes.
-    if ( defined($select_result) ) {
-        print "DB exists.\n";
-        return 1;
-    }
-
-    # If not, we will create the schema.
-    print "DB does not exist yet or is broken. Creating...\n";
-    if (! -f "gm_schema") {
-        die "file gm_schema doesn't exist, cannot create DB\n";
-    }
-
-    # This allows us to preload some monsters and more easily
-    # manage db schema.
-    #
-    # TODO Currently very "hacky".
-    my $sqlite_cmd_output = `sqlite3 $sqlite_db < gm_schema`;
-    if ($sqlite_cmd_output =~ /Error/){
-        print "$sqlite_cmd_output\n";
-        `rm $sqlite_db`;
-        exit 
-    }
-}
-
-
 # MAIN ROUTINE
 sub game() {
     my $message = $_[0];
@@ -100,11 +64,8 @@ sub game() {
         }
         # Did they not try to fight their assailant?
         else {
-            #return qq/$message->{who} is waiting for the opportune moment to "fight" the $monster_info[0]!/;
             return $story->afraid($message->{who},$monster_info[0]);
         }
-
-
     }
 
 #    return $story->quest($message->{who});
@@ -146,6 +107,14 @@ sub check_character() {
     return $story->welcome($nick);
 }
 
+
+##################################
+#                                #
+#    Basic static setup stuff    #
+#                                #
+##################################
+
+# Overloading the said function.
 sub Bot::BasicBot::said {
     my ($self, $message) = @_;
     my $address = $message->{address};
@@ -170,6 +139,41 @@ sub Bot::BasicBot::help {
     "Feel free to message me and you can get started on your mighty quest! " .
     "See more about me here: https://github.com/mstathers/gamemaster";
     return $message;
+}
+
+# Some pre-flight checks - this will create the schema.
+sub check_db() {
+    # Does the table exist in the DB?
+    my $select = $dbh->prepare(
+        "SELECT * FROM
+        sqlite_master where
+        name = 'characters'"
+    );
+    $select->execute();
+    my $select_result = $select->fetch();
+
+    # Normally, yes.
+    if ( defined($select_result) ) {
+        print "DB exists.\n";
+        return 1;
+    }
+
+    # If not, we will create the schema.
+    print "DB does not exist yet or is broken. Creating...\n";
+    if (! -f "gm_schema") {
+        die "file gm_schema doesn't exist, cannot create DB\n";
+    }
+
+    # This allows us to preload some monsters and more easily
+    # manage db schema.
+    #
+    # TODO Currently very "hacky".
+    my $sqlite_cmd_output = `sqlite3 $sqlite_db < gm_schema`;
+    if ($sqlite_cmd_output =~ /Error/){
+        print "$sqlite_cmd_output\n";
+        `rm $sqlite_db`;
+        exit 
+    }
 }
 
 # $bot object constructor.
