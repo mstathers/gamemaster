@@ -61,7 +61,18 @@ sub game() {
         # If they wanted to fight, let them!
         if ($message->{body} =~ /fight/i) {
             my $combat_result = &fight($char_str, $char_lvl, $mon_str, $mon_lvl);
-            return $combat_result;
+            
+            # This enemy is finished, win or lose.
+            #&reset_monster($nick);
+
+            # How did they do?
+            if ($combat_result =~ /victory/) {
+                my $exp = &calc_exp($nick, $char_lvl, $mon_lvl);
+                return "You win...\n$exp";
+            }
+            if ($combat_result =~ /failure/) {
+                return "you lose";
+            }
         }
 
         # Did they not try to fight their assailant?
@@ -109,6 +120,7 @@ sub check_character() {
     return $story->welcome($nick);
 }
 
+# routine to determin the victor of a fight.
 sub fight() {
     my ($char_str, $char_lvl, $mon_str, $mon_lvl) = @_;
 
@@ -134,7 +146,83 @@ sub fight() {
     }
 }
 
+# Reset a monster so that a character is no longer fighting.
+sub reset_monster() {
+    my ($nick) = @_;
 
+    my $update = $dbh->prepare(
+        "UPDATE characters
+        SET fighting = null
+        where nick = '$nick'"
+    );
+    $update->execute();
+    return undef;
+}
+
+# Used to calculate EXP. We we use the difference in levels to do this:
+#
+#    y=(1.11^x)*50
+#
+# It should close to 50 exp, depending on the difference.
+#
+##################################################
+#We also calculate level-ups here!
+#
+#    y=(x^.5/75^.5)+1
+#
+# It looks a bit like this:
+#
+# lvl  |  exp
+# ------------
+#   1  |    0
+#   2  |   75
+#   3  |  300
+#   4  |  675
+#     etc
+#
+sub calc_exp() {
+    my ($nick, $char_lvl, $mon_lvl) = @_;
+
+    # we need the difference first
+    my $lvl_diff = int($mon_lvl - $char_lvl);
+    # we can the calculate.
+    my $exp_gain = int((1.11 ** $lvl_diff)*50);
+
+    # We need to update the character's EXP in the DB.
+    my $update = $dbh->prepare(
+        "UPDATE characters
+        SET exp = exp + $exp_gain
+        where nick = '$nick'"
+    );
+    $update->execute();
+
+
+    # We also need to see if they leveled up!
+    my $select = $dbh->prepare(
+        "SELECT exp FROM
+        characters where
+        nick = '$nick'"
+    );
+    $select->execute();
+    my ($char_exp) = $select->fetchrow_array();
+
+    # Calculate what the character's level should be.
+    my $new_level = int((($char_exp ** .5) / (75 ** .5)) + 1);
+    
+    # Did they go up a level?
+    if ($new_level > $char_lvl) {
+        my $update = $dbh->prepare(
+            "UPDATE characters
+            SET level = $new_level
+            where nick = '$nick'"
+        );
+        $update->execute();
+
+        return "Exp Gain: $exp_gain\nNEW LEVEL! LEVEL: $new_level";
+    }
+
+    return "Exp Gain (nolvl): $exp_gain";
+}
 
 ##################################
 #                                #
