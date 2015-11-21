@@ -26,45 +26,46 @@ my $story = story->new();
 # MAIN ROUTINE
 sub game() {
     my $message = $_[0];
+    my $nick = $message->{who};
 
     # Log  message
-    print "log: $message->{who}: $message->{body}\n";
+    print "log: $nick: $message->{body}\n";
 
     # Do we recognize this character?
-    my $ret = &check_character($message->{who});
+    my $ret = &check_character($nick);
     # This will only work if new character.
     if (defined($ret)) {
         return $ret;
     }
 
-    # We will check if this character is fighting or not.
+    # We recognized the character, let's grab his base info.
     my $select = $dbh->prepare(
-        "SELECT fighting FROM
+        "SELECT strength, level, exp, fighting FROM
         characters where
-        nick = '$message->{who}'"
+        nick = '$nick'"
     );
     $select->execute();
-    my @monster_id = $select->fetchrow_array();
+    my ($char_str, $char_lvl, $char_exp, $monster_id) = $select->fetchrow_array();
 
     # If there is a monster, we can fight it!
-    if (defined($monster_id[0])) {
+    if (defined($monster_id)) {
         # Let's get some info about the monster
         my $select = $dbh->prepare(
             "SELECT name,strength,level FROM
             monsters where
-            id = '$monster_id[0]'"
+            id = '$monster_id'"
         );
         $select->execute();
-        my @monster_info = $select->fetchrow_array();
+        my ($mon_name, $mon_str, $mon_lvl) = $select->fetchrow_array();
 
 
         # If they wanted to fight, let them!
         if ($message->{body} =~ /fight/i) {
-            return "Monster: $monster_info[0] MonsterStr: $monster_info[1] MonsterLvl: $monster_info[2]";
+            return "Monster: $mon_name MonsterStr: $mon_str MonsterLvl: $mon_lvl";
         }
         # Did they not try to fight their assailant?
         else {
-            return $story->afraid($message->{who},$monster_info[0]);
+            return $story->afraid($nick,$mon_name);
         }
     }
 
