@@ -243,7 +243,7 @@ sub new_quest() {
     );
     $select->execute();
     my ($monster_max_id) = $select->fetchrow_array();
-    # Random monster id. This is +1 because we odn't want zero.
+    # Random monster id. This is +1 because we don't want zero.
     my $random_monster = int(rand($monster_max_id) + 1);
 
     # we need to save to the db that this monster is fighting the
