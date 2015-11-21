@@ -98,9 +98,10 @@ sub game() {
         if ($message->{body} =~ /fight/i) {
             return "Monster: $monster_info[0] MonsterStr: $monster_info[1] MonsterLvl: $monster_info[2]";
         }
-        # Did they not try to fight their assailent?
+        # Did they not try to fight their assailant?
         else {
-            return "I guess you didn't want to fight your attacker";
+            #return qq/$message->{who} is waiting for the opportune moment to "fight" the $monster_info[0]!/;
+            return $story->afraid($message->{who},$monster_info[0]);
         }
 
 

@@ -1,5 +1,5 @@
 package story;
-# Modele which contains all story text for the bot.
+# Module which contains all story text for the bot.
 
 use strict;
 use warnings;
@@ -23,18 +23,31 @@ sub stripper() {
     return $text;
 }
 
+# Only used for new characters, we always fight the goblin monster (id #1)
 sub welcome() {
     my ($self, $nick) = @_;
 
     my $greeting = qq/The valiant knight $nick approaches! $nick is ready to
     head out to face the evil of the world and rise triumphant over all
     foes!/;
-    my $first_combat = qq/As you are travelling up the road, you hear a
-    rustling of bushes beside you. With a shreak a goblin jumps out onto the
-    road and assults you with his crude dagger! You must "fight" it!/;
+    my $first_combat = qq/As you are traveling up the road, you hear a
+    rustling of bushes beside you. With a shriek a goblin jumps out onto the
+    road and assaults you with his crude dagger! You must "fight" it!/;
 
     my $text = &stripper($greeting) . "\n" . &stripper($first_combat);
     return $text;
+}
+
+# If a character is supposed to be fighting something but they aren't 
+# actually fighting for some reason.
+sub afraid() {
+    my ($self, $nick, $monster) = @_;
+
+    my $text = qq/The brave knight $nick waits, weapon drawn, for the
+    opportune moment to strike the $monster. $nick knows that timing is key
+    to this victory!/;
+
+    return &stripper($text);
 }
 
 sub quest() {
