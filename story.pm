@@ -50,6 +50,27 @@ sub afraid() {
     return &stripper($text);
 }
 
+# If the character is victorious!
+sub victory() {
+    my ($self, $nick, $mon_name, $new_level) = @_;
+
+    my $victory = qq/With an arcing swing of $nick\'s blade, the
+    great warrior puts the $mon_name out of its misery for good!/;
+
+    # Specially message if we leveled up.
+    if (defined($new_level)) {
+        my $level_text = qq/LEVEL UP! $nick is now level $new_level!/;
+        my $text = &stripper($victory) . "\n" . &stripper($level_text);
+        return $text
+    }
+
+    return &stripper($victory);
+}
+
+
+
+
+
 sub quest() {
     my ($self, $nick) = @_;
 

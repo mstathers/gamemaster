@@ -67,8 +67,8 @@ sub game() {
 
             # How did they do?
             if ($combat_result =~ /victory/) {
-                my $exp = &calc_exp($nick, $char_lvl, $mon_lvl);
-                return "You win...\n$exp";
+                my $new_level = &calc_exp($nick, $char_lvl, $mon_lvl);
+                return $story->victory($nick,$mon_name,$new_level);
             }
             if ($combat_result =~ /failure/) {
                 return "you lose";
@@ -120,11 +120,11 @@ sub check_character() {
     return $story->welcome($nick);
 }
 
-# routine to determin the victor of a fight.
+# routine to determine the victor of a fight.
 sub fight() {
     my ($char_str, $char_lvl, $mon_str, $mon_lvl) = @_;
 
-    # We calculate modifiers - I am using the pfsrd ability score modifierds
+    # We calculate modifiers - I am using the pfsrd ability score modifiers
     # for inspiration under the OGL.
     #
     # http://www.d20pfsrd.com/basics-ability-scores/ability-scores
@@ -218,10 +218,12 @@ sub calc_exp() {
         );
         $update->execute();
 
-        return "Exp Gain: $exp_gain\nNEW LEVEL! LEVEL: $new_level";
+        # We need to pass back if we level up.
+        return "$new_level";
     }
 
-    return "Exp Gain (nolvl): $exp_gain";
+    # We can be quiet.
+    return undef;
 }
 
 ##################################
