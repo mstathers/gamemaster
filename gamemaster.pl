@@ -67,10 +67,47 @@ sub game() {
     print "log: $message->{who}: $message->{body}\n";
 
     # Do we recognize this character?
-    &check_character($message->{who});
+    my $ret = &check_character($message->{who});
+    # This will only work if new character.
+    if (defined($ret)) {
+        return $ret;
+    }
 
-    # Offer up a quest!
-    #return $story->quest($nick);
+    # We will check if this character is fighting or not.
+    my $select = $dbh->prepare(
+        "SELECT fighting FROM
+        characters where
+        nick = '$message->{who}'"
+    );
+    $select->execute();
+    my @monster_id = $select->fetchrow_array();
+
+    # If there is a monster, we can fight it!
+    if (defined($monster_id[0])) {
+        # Let's get some info about the monster
+        my $select = $dbh->prepare(
+            "SELECT name,strength,level FROM
+            monsters where
+            id = '$monster_id[0]'"
+        );
+        $select->execute();
+        my @monster_info = $select->fetchrow_array();
+
+
+        # If they wanted to fight, let them!
+        if ($message->{body} =~ /fight/i) {
+            return "Monster: $monster_info[0] MonsterStr: $monster_info[1] MonsterLvl: $monster_info[2]";
+        }
+        # Did they not try to fight their assailent?
+        else {
+            return "I guess you didn't want to fight your attacker";
+        }
+
+
+    }
+
+#    return $story->quest($message->{who});
+    return "I guess you weren't fighting a monster";
 }
 
 # Routine to see if we know a character, or option make a new one.
