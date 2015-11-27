@@ -59,5 +59,3 @@ union select 'jiangshi',7,1
 union select 'lamya',8,1
 union select 'vrykolakas',9,1
 union select 'zmiy',10,1;
-union select 'thug',7,1
-union select 'bandit',5,1;
