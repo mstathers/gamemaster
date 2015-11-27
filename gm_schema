@@ -41,5 +41,26 @@ INSERT INTO "monsters"
 (name,strength,level)
 select 'hobgoblin' as name,6 as strength,2 as level
 union select 'dog',2,1
+<<<<<<< HEAD
+union select 'xvart',2,1
+union select 'cur',3,1
+union select 'ghoul',3,1
+union select 'vetala',3,1
+union select 'rusalka',4,1
+union select 'alkonost',4,1
+union select 'draugr',5,1
+union select 'jinn',5,1
+union select 'bandit',5,1
+union select 'yokai',5,1
+union select 'naga',5,1
+union select 'thug',6,1
+union select 'likho',6,1
+union select 'dhampir',7,1
+union select 'jiangshi',7,1
+union select 'lamya',8,1
+union select 'vrykolakas',9,1
+union select 'zmiy',10,1;
+=======
 union select 'thug',7,1
 union select 'bandit',5,1;
+>>>>>>> e28d6e8bca1e906002703d5c0aa2c37b3044bcf0
