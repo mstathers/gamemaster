@@ -95,11 +95,11 @@ sub waiting() {
 }
 
 sub new_quest() {
-    my ($self, $nick, $monster) = @_;
+    my ($self, $nick, $adjective, $monster) = @_;
 
     #TODO Perhaps we should store these in DB so that they can be different
     #     for each monster?
-    my $text = qq/A frightening $monster jumps out at $nick. $nick must
+    my $text = qq/The $adjective $monster jumps out at $nick. $nick must
     choose to either "fight" it or "flee" from it.
     /;
 

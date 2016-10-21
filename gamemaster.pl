@@ -246,6 +246,7 @@ sub new_quest() {
     );
     $select->execute();
     my ($monster_max_id) = $select->fetchrow_array();
+
     # Random monster id. This is +1 because we don't want zero.
     my $random_monster = int(rand($monster_max_id) + 1);
 
@@ -258,7 +259,6 @@ sub new_quest() {
     );
     $update->execute($random_monster, $nick);
 
-
     # Let's get some info about the monster
     $select = $dbh->prepare(
         "SELECT name FROM
@@ -268,7 +268,28 @@ sub new_quest() {
     $select->execute($random_monster);
     my ($mon_name) = $select->fetchrow_array();
 
-    return $story->new_quest($nick,$mon_name);
+    # SQL to determine the total number of adjectives in the table.
+    my $select = $dbh->prepare(
+        "SELECT id FROM
+        adjectives WHERE
+        id = (SELECT MAX(id) FROM
+        adjectives)"
+    );
+    $select->execute();
+    my ($adjective_max_id) = $select->fetchrow_array();
+
+    # Randomly pick an adjective.
+    my $random_adjective = int(rand($adjective_max_id) + 1);
+    $select = $dbh->prepare(
+        "SELECT adjective FROM
+        adjectives where
+        id = ?"
+    );
+    $select->execute($random_adjective);
+    my ($monster_adjective) = $select->fetchrow_array();
+
+    # Let the player know what adjective + monster they will be 'fight'-ing
+    return $story->new_quest($nick, $monster_adjective, $mon_name);
 }
 
 
