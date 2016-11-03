@@ -31,12 +31,16 @@ name TEXT,
 strength INT,
 level INT);
 
+--
 -- INSERTING MONSTERS (goblin) --
+--
 INSERT INTO "monsters"
 (name,strength,level) VALUES
 ('goblin',1,1);
 
+--
 -- INSERTING MONSTERS, MASS --
+--
 INSERT INTO "monsters" 
 (name,strength,level)
 select 'hobgoblin' as name,6 as strength,2 as level
@@ -59,3 +63,43 @@ union select 'jiangshi',7,1
 union select 'lamya',8,1
 union select 'vrykolakas',9,1
 union select 'zmiy',10,1;
+
+
+-- Table: adjectives
+--
+-- Columns:
+--  id = Unique key.
+--  adjective = Monster demostrative.
+--
+CREATE TABLE adjectives(
+id INTEGER PRIMARY KEY ASC,
+adjective TEXT);
+
+
+--
+-- INSERTING ADJECTIVE ENTRIES --
+--
+INSERT INTO "adjectives"
+(adjective)
+select 'frightening' as adjective
+union select 'scary'
+union select 'battle-hardened'
+union select 'smelly'
+union select 'ugly'
+union select 'bizarre'
+union select 'cruel'
+union select 'infused'
+union select 'confused'
+union select 'savage'
+union select 'decadent'
+union select 'corrupted'
+union select 'toothsome'
+union select 'curious'
+union select 'kind-hearted'
+union select 'talkative'
+union select 'listless'
+union select 'possessed'
+union select 'drunk'
+union select 'grey'
+union select 'partially-decomposed'
+union select 'mean';
